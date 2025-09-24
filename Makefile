@@ -1,4 +1,4 @@
-MY_PROGRAM = prorgam.exe
+MY_PROGRAM = program.exe
 
 CXX = g++
 

@@ -3,6 +3,15 @@
 
 #include <stdlib.h>
 
+enum error {
+    OK                    = 0,
+    POP_ON_EMPTY_STACK    = 1,
+    STACK_NULL_PTR        = 2,
+    STACK_EXPANTION_ERR   = 3,
+    STACK_CONTRACTION_ERR = 4,
+    STACK_INIT_ERR        = 5
+};
+
 typedef int stack_elem_t;
 
 /// @brief Сруктура, хранящая стэк
@@ -20,28 +29,33 @@ static const size_t GROW_FACTOR = 2;
 /// @brief Функция иницивлизации стэка
 /// @param stack Стэк
 /// @param capacity начальный вместимость стэка
-void StackInit(Stack* stack, size_t capacity);
+/// @return Код ошибки
+error StackInit(Stack* stack, size_t capacity);
 
 /// @brief Увиличивает вместимость стэка в GROW_FACTOR раз
 /// @param stack Стэк
-void StackExpantion(Stack* stack);
+/// @return Код ошибки
+error StackExpantion(Stack* stack);
 
 /// @brief Уменьшает вместимость стэка в GROW_FACTOR раз
 /// @param stack Стэк
-void StackContaction(Stack* stack);
+/// @return Код ошибки
+error StackContraction(Stack* stack);
 
 /// @brief Функция освобождения всей памяти выделенной под стэк
 /// @param stack Стэк
-void StackFree(Stack* stack); 
+/// @return Код ошибки
+error StackFree(Stack* stack); 
 
 /// @brief Добавляет элемент в стэк
 /// @param stack Стэк
 /// @param elem Элемент
-void StackAdd(Stack* stack, stack_elem_t elem);
+/// @return Код ошибки
+error StackAdd(Stack* stack, stack_elem_t elem);
 
 /// @brief Удаляет последний элемент из стэка
 /// @param stack Стэк
-/// @return Знвчение удаленного элемента
-stack_elem_t StackPop(Stack* stack);
+/// @return Код ошибки
+error StackPop(Stack* stack, stack_elem_t* poped_elem);
 
 #endif // STACK_H_

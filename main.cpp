@@ -13,9 +13,16 @@ int main() {
 
     printf("added\n");
 
-    printf("%d\n", StackPop(&stack));
-    printf("%d\n", StackPop(&stack));
-    printf("%d\n", StackPop(&stack));
+    int poped_elem = 0;
+
+    StackPop(&stack, &poped_elem);
+    printf("%d\n", poped_elem);
+    StackPop(&stack, &poped_elem);
+    printf("%d\n", poped_elem);
+    StackPop(&stack, &poped_elem);
+    printf("%d\n", poped_elem);
+    StackPop(&stack, &poped_elem);
+    printf("%d\n", poped_elem);
 
     printf("poped\n");
 

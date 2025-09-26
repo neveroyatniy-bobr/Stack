@@ -9,7 +9,9 @@ enum error {
     STACK_NULL_PTR        = 2,
     STACK_EXPANTION_ERR   = 3,
     STACK_CONTRACTION_ERR = 4,
-    STACK_INIT_ERR        = 5
+    STACK_INIT_ERR        = 5,
+    STACK_DATA_NULL_PTR   = 6,
+    STACK_OVERFLOW        = 7
 };
 
 typedef int stack_elem_t;
@@ -45,7 +47,7 @@ error StackContraction(Stack* stack);
 /// @brief Функция освобождения всей памяти выделенной под стэк
 /// @param stack Стэк
 /// @return Код ошибки
-error StackFree(Stack* stack); 
+error StackFree(Stack* stack);
 
 /// @brief Добавляет элемент в стэк
 /// @param stack Стэк
@@ -57,5 +59,9 @@ error StackAdd(Stack* stack, stack_elem_t elem);
 /// @param stack Стэк
 /// @return Код ошибки
 error StackPop(Stack* stack, stack_elem_t* poped_elem);
+
+error StackVerefy(Stack* stack);
+
+void StackDump(Stack* stack);
 
 #endif // STACK_H_

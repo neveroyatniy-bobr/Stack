@@ -3,6 +3,10 @@
 #include <assert.h>
 #include <stdio.h>
 
+inline static size_t min(size_t a, size_t b) {
+    return a <= b ? a : b;
+}
+
 error StackInit(Stack* stack, size_t capacity) {
     if (stack == NULL) {
         return STACK_NULL_PTR;
@@ -59,7 +63,7 @@ error StackFree(Stack* stack) {
     }
 
     free(stack->data);
-    
+
     stack->capacity = 0;
     stack->size = 0;
     stack->data = NULL;
@@ -101,4 +105,34 @@ error StackPop(Stack* stack, stack_elem_t* poped_elem) {
     }
 
     return OK;
+}
+
+error StackVerefy(Stack* stack) {
+    if (stack == NULL) {
+        return STACK_NULL_PTR;
+    }
+
+    if (stack->data == NULL) {
+        return STACK_DATA_NULL_PTR;
+    }
+
+    if (stack->size > stack->capacity) {
+        return STACK_OVERFLOW;
+    }
+
+    return OK;
+}
+
+void StackDump(Stack* stack) {
+    printf("capacity = %lu\n", stack->capacity);
+    printf("size = %lu\n", stack->size);
+    printf("data = %p\n", stack->data);
+
+    if (stack->data == NULL) {
+        return;
+    }
+
+    for (size_t i = 0; i < min(stack->size, stack->capacity); i++) {
+        printf("data[%lu] = %d\n", i, stack->data[i]);
+    }
 }

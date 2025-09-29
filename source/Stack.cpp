@@ -7,7 +7,43 @@ inline static size_t min(size_t a, size_t b) {
     return a <= b ? a : b;
 }
 
-error StackInit(Stack* stack, size_t capacity) {
+void PrintStackError(Error error) {
+    switch (error)
+    {
+        case OK:
+            fprintf(stderr, "Выполнено без ошибок\n");
+            break;
+        case POP_ON_EMPTY_STACK:
+            fprintf(stderr, "Попытка удалить элемент из пустого стэка\n");
+            break;
+        case STACK_NULL_PTR:
+            fprintf(stderr, "Нулевой указатель на стэк\n");
+            break;
+        case STACK_EXPANTION_ERR:
+            fprintf(stderr, "Ошибка увеличения памяти для стэка\n");
+            break;
+        case STACK_CONTRACTION_ERR:
+            fprintf(stderr, "Ошибка уменьшения памяти для стэка\n");
+            break;
+        case STACK_INIT_ERR:
+            fprintf(stderr, "Ошибка выделения памяти на стэк\n");
+            break;
+        case STACK_DATA_NULL_PTR:
+            fprintf(stderr, "Нулевой указатель на данные стэка\n");
+            break;
+        case STACK_OVERFLOW:
+            fprintf(stderr, "Переполнение стэка\n");
+            break;
+        case POPED_ELEM_NULL_PTR:
+            fprintf(stderr, "Нулевой указатель на удаленный элемент\n");
+            break;
+        default:
+            fprintf(stderr, "Непредвиденная ошибка\n");
+            break;
+    }
+}
+
+Error StackInit(Stack* stack, size_t capacity) {
     if (stack == NULL) {
         return STACK_NULL_PTR;
     }
@@ -22,10 +58,14 @@ error StackInit(Stack* stack, size_t capacity) {
     }
     stack->data = data;
 
+    StackCheck(stack);
+
     return OK;
 }
 
-error StackExpantion(Stack* stack) {
+Error StackExpantion(Stack* stack) {
+    StackCheck(stack);
+
     if (stack == NULL) {
         return STACK_NULL_PTR;
     }
@@ -38,10 +78,14 @@ error StackExpantion(Stack* stack) {
 
     stack->capacity *= GROW_FACTOR;
 
+    StackCheck(stack);
+
     return OK;
 }
 
-error StackContraction(Stack* stack) {
+Error StackContraction(Stack* stack) {
+    StackCheck(stack);
+
     if (stack == NULL) {
         return STACK_NULL_PTR;
     }
@@ -52,12 +96,16 @@ error StackContraction(Stack* stack) {
     }
     stack->data = data;
 
-    stack->capacity *= GROW_FACTOR;
+    stack->capacity /= GROW_FACTOR;
+
+    StackCheck(stack);
 
     return OK;
 }
 
-error StackFree(Stack* stack) {
+Error StackFree(Stack* stack) {
+    StackCheck(stack);
+
     if (stack == NULL) {
         return STACK_NULL_PTR;
     }
@@ -71,7 +119,9 @@ error StackFree(Stack* stack) {
     return OK;
 }
 
-error StackAdd(Stack* stack, stack_elem_t elem) {
+Error StackAdd(Stack* stack, stack_elem_t elem) {
+    StackCheck(stack);
+
     if (stack == NULL) {
         return STACK_NULL_PTR;
     }
@@ -83,12 +133,16 @@ error StackAdd(Stack* stack, stack_elem_t elem) {
     stack->data[stack->size] = elem;
     stack->size++;
 
+    StackCheck(stack);
+
     return OK;
 }
 
-error StackPop(Stack* stack, stack_elem_t* poped_elem) {
-    if (stack == NULL) {
-        return STACK_NULL_PTR;
+Error StackPop(Stack* stack, stack_elem_t* poped_elem) {
+    StackCheck(stack);
+
+    if (poped_elem == NULL) {
+        return POPED_ELEM_NULL_PTR;
     }
 
     if (stack->size == 0) {
@@ -104,10 +158,12 @@ error StackPop(Stack* stack, stack_elem_t* poped_elem) {
         StackContraction(stack);
     }
 
+    StackCheck(stack);
+
     return OK;
 }
 
-error StackVerefy(Stack* stack) {
+Error StackVerefy(Stack* stack) {
     if (stack == NULL) {
         return STACK_NULL_PTR;
     }
@@ -123,16 +179,23 @@ error StackVerefy(Stack* stack) {
     return OK;
 }
 
-void StackDump(Stack* stack) {
-    printf("capacity = %lu\n", stack->capacity);
-    printf("size = %lu\n", stack->size);
-    printf("data = %p\n", stack->data);
+void StackDump(Stack* stack, Error error_code) {
+    PrintStackError(error_code);
+
+    fprintf(stderr, "capacity = %lu\n", stack->capacity);
+    fprintf(stderr, "size     = %lu\n", stack->size);
+    fprintf(stderr, "data     = %p\n", stack->data);
 
     if (stack->data == NULL) {
         return;
     }
 
     for (size_t i = 0; i < min(stack->size, stack->capacity); i++) {
-        printf("data[%lu] = %d\n", i, stack->data[i]);
+        fprintf(stderr, "data[%lu] = %d\n", i, stack->data[i]);
     }
+}
+
+bool Die(Stack* stack, Error error_code) {
+    StackDump(stack, error_code);
+    return 0;
 }

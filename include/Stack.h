@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-enum error {
+enum Error {
     OK                    = 0,
     POP_ON_EMPTY_STACK    = 1,
     STACK_NULL_PTR        = 2,
@@ -11,8 +11,13 @@ enum error {
     STACK_CONTRACTION_ERR = 4,
     STACK_INIT_ERR        = 5,
     STACK_DATA_NULL_PTR   = 6,
-    STACK_OVERFLOW        = 7
+    STACK_OVERFLOW        = 7,
+    POPED_ELEM_NULL_PTR   = 8
 };
+
+/// @brief Выводит сообщение об ошибке в stderr
+/// @param error Код ошибки
+void PrintStackError(Error error);
 
 typedef int stack_elem_t;
 
@@ -32,36 +37,57 @@ static const size_t GROW_FACTOR = 2;
 /// @param stack Стэк
 /// @param capacity начальный вместимость стэка
 /// @return Код ошибки
-error StackInit(Stack* stack, size_t capacity);
+Error StackInit(Stack* stack, size_t capacity);
 
 /// @brief Увиличивает вместимость стэка в GROW_FACTOR раз
 /// @param stack Стэк
 /// @return Код ошибки
-error StackExpantion(Stack* stack);
+Error StackExpantion(Stack* stack);
 
 /// @brief Уменьшает вместимость стэка в GROW_FACTOR раз
 /// @param stack Стэк
 /// @return Код ошибки
-error StackContraction(Stack* stack);
+Error StackContraction(Stack* stack);
 
 /// @brief Функция освобождения всей памяти выделенной под стэк
 /// @param stack Стэк
 /// @return Код ошибки
-error StackFree(Stack* stack);
+Error StackFree(Stack* stack);
 
 /// @brief Добавляет элемент в стэк
 /// @param stack Стэк
 /// @param elem Элемент
 /// @return Код ошибки
-error StackAdd(Stack* stack, stack_elem_t elem);
+Error StackAdd(Stack* stack, stack_elem_t elem);
 
 /// @brief Удаляет последний элемент из стэка
 /// @param stack Стэк
+/// @param poped_elem Ссылка на переменную, в которую будет записано значение удаленного элемента
 /// @return Код ошибки
-error StackPop(Stack* stack, stack_elem_t* poped_elem);
+Error StackPop(Stack* stack, stack_elem_t* poped_elem);
 
-error StackVerefy(Stack* stack);
+/// @brief Проверяет стэк на ошибки
+/// @param stack  Стэк
+/// @return Код ошибки
+Error StackVerefy(Stack* stack);
 
-void StackDump(Stack* stack);
+/// @brief Выводит информацию о поломке стэка
+/// @param stack Стэк
+/// @param error_code Код ошибки
+void StackDump(Stack* stack, Error error_code);
+
+#define StackCheck(stack)                \
+{                                        \
+    Error err_code = StackVerefy(stack); \
+    if (err_code != OK) {                \
+        return err_code;                 \
+    }                                    \
+}
+
+bool Die(Stack* stack, Error error_code);
+
+#define DO { Error err_code_ = OK; (OK == (err_code_ = 
+#define OR )) ||
+#define DIE(stack) Die(stack, err_code_); }
 
 #endif // STACK_H_

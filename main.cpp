@@ -5,28 +5,28 @@
 int main() {
     Stack stack = {};
 
-    StackInit(&stack, 1);
+    DO StackInit(&stack, 1) OR DIE(&stack);
 
-    StackAdd(&stack, 1);
-    StackAdd(&stack, 2);
-    StackAdd(&stack, 3);
+    DO StackAdd(&stack, 1) OR DIE(&stack);
+    DO StackAdd(&stack, 2) OR DIE(&stack);
+    DO StackAdd(&stack, 2) OR DIE(&stack);
 
     printf("added\n");
 
     int poped_elem = 0;
 
-    StackPop(&stack, &poped_elem);
+    DO StackPop(&stack, &poped_elem) OR DIE(&stack);
     printf("%d\n", poped_elem);
-    StackPop(&stack, &poped_elem);
+    DO StackPop(&stack, &poped_elem) OR DIE(&stack);
     printf("%d\n", poped_elem);
-    StackPop(&stack, &poped_elem);
+    DO StackPop(&stack, &poped_elem) OR DIE(&stack);
     printf("%d\n", poped_elem);
-    StackPop(&stack, &poped_elem);
+    DO StackPop(&stack, &poped_elem) OR DIE(&stack);
     printf("%d\n", poped_elem);
 
     printf("poped\n");
 
-    StackFree(&stack);
+    DO StackFree(&stack) OR DIE(&stack);
 
     return 0;
 }

@@ -24,8 +24,6 @@ int main() {
     DO StackPop(&stack, &poped_elem) OR DIE(&stack);
     printf("%d\n", poped_elem);
 
-    *(stack.data - 1) = 123;
-
     DO StackVerefy(&stack) OR DIE(&stack);
 
     printf("poped\n");

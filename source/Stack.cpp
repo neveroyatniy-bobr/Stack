@@ -37,26 +37,34 @@ void PrintStackError(Error error) {
         case POPED_ELEM_NULL_PTR:
             fprintf(stderr, "Нулевой указатель на удаленный элемент\n");
             break;
+        case BIRD_ERROR:
+            fprintf(stderr, "Вмешательство в буффер стэка извне\n");
+            break;
         default:
             fprintf(stderr, "Непредвиденная ошибка\n");
             break;
     }
 }
 
-Error StackInit(Stack* stack, size_t capacity) {
+Error StackInit(Stack* stack, size_t elem_capacity) {
     if (stack == NULL) {
         return STACK_NULL_PTR;
     }
 
-    stack->capacity = (capacity >= MIN_CAPACITY ? capacity : MIN_CAPACITY);
+    stack->capacity = (elem_capacity >= MIN_CAPACITY ? elem_capacity : MIN_CAPACITY) + 2 * BIRD_SIZE;
 
     stack->size = 0;
 
-    stack_elem_t* data = (stack_elem_t*)calloc(stack->capacity, sizeof(stack_elem_t));
+    stack_elem_t* data = (stack_elem_t*)calloc(stack->capacity, sizeof(stack_elem_t)) + BIRD_SIZE;
     if (data == NULL) {
         return STACK_INIT_ERR;
     }
     stack->data = data;
+
+    for (int i = 0; i < BIRD_SIZE; i++) {
+        *(stack->data - BIRD_SIZE + i) = BIRD_VALUE;
+        *(stack->data + stack->capacity - 2 * BIRD_SIZE + i) = BIRD_VALUE;
+    }
 
     StackCheck(stack);
 
@@ -76,7 +84,15 @@ Error StackExpantion(Stack* stack) {
     }
     stack->data = data;
 
+    for (int i = 0; i < BIRD_SIZE; i++) {
+        *(stack->data + stack->capacity - 2 * BIRD_SIZE + i) = 0;
+    }
+
     stack->capacity *= GROW_FACTOR;
+
+    for (int i = 0; i < BIRD_SIZE; i++) {
+        *(stack->data + stack->capacity - 2 * BIRD_SIZE + i) = BIRD_VALUE;
+    }
 
     StackCheck(stack);
 
@@ -96,7 +112,15 @@ Error StackContraction(Stack* stack) {
     }
     stack->data = data;
 
+    for (int i = 0; i < BIRD_SIZE; i++) {
+        *(stack->data + stack->capacity - 2 * BIRD_SIZE + i) = 0;
+    }
+
     stack->capacity /= GROW_FACTOR;
+
+    for (int i = 0; i < BIRD_SIZE; i++) {
+        *(stack->data + stack->capacity - 2 * BIRD_SIZE + i) = BIRD_VALUE;
+    }
 
     StackCheck(stack);
 
@@ -110,7 +134,7 @@ Error StackFree(Stack* stack) {
         return STACK_NULL_PTR;
     }
 
-    free(stack->data);
+    free(stack->data - BIRD_SIZE);
 
     stack->capacity = 0;
     stack->size = 0;
@@ -126,7 +150,7 @@ Error StackAdd(Stack* stack, stack_elem_t elem) {
         return STACK_NULL_PTR;
     }
 
-    if (stack->size == stack->capacity / GROW_FACTOR) {
+    if (stack->size == (stack->capacity - 2 * BIRD_SIZE) / GROW_FACTOR) {
         StackExpantion(stack);
     }
 
@@ -154,7 +178,7 @@ Error StackPop(Stack* stack, stack_elem_t* poped_elem) {
     stack->data[stack->size - 1] = 0;
     stack->size--;
 
-    if (stack->size == stack->capacity / GROW_FACTOR) {
+    if (stack->size == (stack->capacity - 2 * BIRD_SIZE) / GROW_FACTOR) {
         StackContraction(stack);
     }
 
@@ -172,8 +196,17 @@ Error StackVerefy(Stack* stack) {
         return STACK_DATA_NULL_PTR;
     }
 
-    if (stack->size > stack->capacity) {
+    if (stack->size > stack->capacity - 2 * BIRD_SIZE) {
         return STACK_OVERFLOW;
+    }
+
+    bool bird = true;
+    for (int i = 0; i < BIRD_SIZE; i++) {
+        bird = *(stack->data - BIRD_SIZE + i) == BIRD_VALUE ? bird : false;
+        bird = *(stack->data + stack->capacity - 2 * BIRD_SIZE + i) == BIRD_VALUE ? bird : false;
+    }
+    if (!bird) {
+        return BIRD_ERROR;
     }
 
     return OK;

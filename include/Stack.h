@@ -12,7 +12,8 @@ enum Error {
     STACK_INIT_ERR        = 5,
     STACK_DATA_NULL_PTR   = 6,
     STACK_OVERFLOW        = 7,
-    POPED_ELEM_NULL_PTR   = 8
+    POPED_ELEM_NULL_PTR   = 8,
+    BIRD_ERROR            = 9
 };
 
 /// @brief Выводит сообщение об ошибке в stderr
@@ -32,6 +33,11 @@ struct Stack {
 static const size_t MIN_CAPACITY = 16;
 /// @brief Фактор увеличения вместимости стэка при переполнении
 static const size_t GROW_FACTOR = 2;
+
+/// @brief Толщина канареешной защиты
+static const ssize_t BIRD_SIZE = 1;
+/// @brief Значение канарейки
+static const stack_elem_t BIRD_VALUE = 1890165238;
 
 /// @brief Функция иницивлизации стэка
 /// @param stack Стэк

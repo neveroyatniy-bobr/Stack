@@ -39,6 +39,10 @@ static const ssize_t BIRD_SIZE = 1;
 /// @brief Значение канарейки
 static const stack_elem_t BIRD_VALUE = 1890165238;
 
+typedef bool (*Handler)(Stack* stack, Error error_code);
+
+static Handler handler;
+
 /// @brief Функция иницивлизации стэка
 /// @param stack Стэк
 /// @param capacity начальный вместимость стэка
@@ -91,6 +95,7 @@ void StackDump(Stack* stack, Error error_code);
 }
 
 bool Die(Stack* stack, Error error_code);
+// FIXME Сощдать глобальный указатель на хэндлер 
 
 #define DO { Error err_code_ = OK; (OK == (err_code_ = 
 #define OR )) ||
